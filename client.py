@@ -6,9 +6,12 @@ from threading import Thread
 # ---ПУГАМЕ НАЛАШТУВАННЯ ---
 WIDTH, HEIGHT = 800, 600
 init()
+mixer.init()
 screen = display.set_mode((WIDTH, HEIGHT))
 clock = time.Clock()
 display.set_caption("Пінг-Понг")
+racket = image.load("racket-5084270_1280.png")
+racket = transform.scale(racket, (300, 300))
 # ---СЕРВЕР ---
 def connect_to_server():
     while True:
@@ -38,12 +41,12 @@ def receive():
             break
 
 # --- ШРИФТИ ---
-font_win = font.Font(None, 72)
-font_main = font.Font(None, 36)
+font_win = font.Font("Gurl.ttf", 72)
+font_main = font.Font("Gurl.ttf", 36)
 # --- ЗОБРАЖЕННЯ ----
 
 # --- ЗВУКИ ---
-
+sound_wall_hit = mixer.Sound("bullet-hit-metal-84818.mp3")
 # --- ГРА ---
 game_over = False
 winner = None
@@ -72,9 +75,9 @@ while True:
                 you_winner = False
 
         if you_winner:
-            text = "Ти переміг!"
+            text = "Yas, you won!"
         else:
-            text = "Пощастить наступним разом!"
+            text = "Better luck next time!"
 
         win_text = font_win.render(text, True, (255, 215, 0))
         text_rect = win_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
@@ -90,21 +93,22 @@ while True:
     if game_state:
         screen.fill((30, 30, 30))
         draw.rect(screen, (0, 255, 0), (20, game_state['paddles']['0'], 20, 100))
-        draw.rect(screen, (255, 0, 255), (WIDTH - 40, game_state['paddles']['1'], 20, 100))
+        #draw.rect(screen, (255, 0, 255), (WIDTH - 40, game_state['paddles']['1'], 20, 100))
+        screen.blit(racket, (game_state['paddles']['x'], game_state['paddels']['y']))
         draw.circle(screen, (255, 255, 255), (game_state['ball']['x'], game_state['ball']['y']), 10)
         score_text = font_main.render(f"{game_state['scores'][0]} : {game_state['scores'][1]}", True, (255, 255, 255))
         screen.blit(score_text, (WIDTH // 2 -25, 20))
 
         if game_state['sound_event']:
             if game_state['sound_event'] == 'wall_hit':
-                # звук відбиття м'ячика від стін
+                sound_wall_hit.play()# звук відбиття м'ячика від стін
                 pass
             if game_state['sound_event'] == 'platform_hit':
                 # звук відбиття м'ячика від платформи
                 pass
 
     else:
-        wating_text = font_main.render(f"Очікування гравців...", True, (255, 255, 255))
+        wating_text = font_main.render(f"Waiting for another player,hun wait a bit", True, (255, 255, 255))
         screen.blit(wating_text, (WIDTH // 2 - 25, 20))
 
     display.update()
